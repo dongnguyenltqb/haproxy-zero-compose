@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  haproxy:
+    image: haproxy
+    volumes:
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    networks: 
+      - zero
+    ports:
+      - "8785:8785"
+  static_a:
+    build: 
+      context: static-svc
+      dockerfile: Dockerfile
+    environment:
+      - PORT=3000
+    networks:
+      - zero
+  static_b:
+    build: 
+      context: static-svc
+      dockerfile: Dockerfile
+    environment:
+      - PORT=3000
+    networks:
+      - zero
+
+networks:
+  zero:
+    driver: bridge
