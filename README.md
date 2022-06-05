@@ -14,7 +14,7 @@
    - Wait for this instance warn up and receiving traffic
    - Do similar step for the other.
 
-3. Demo check
+3. **Demo check**
 
    - start project
 
@@ -40,4 +40,4 @@
 
      ```
 
-   - check the test request
+   - check the test result
