@@ -1,16 +1,18 @@
-version: '3'
+version: "3.9"
 
 services:
   haproxy:
-    image: haproxy
+    build:
+      context: haproxy
+      dockerfile: Dockerfile
     volumes:
       - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
-    networks: 
+    networks:
       - zero
     ports:
       - "8785:80"
   static_a:
-    build: 
+    build:
       context: static-svc
       dockerfile: Dockerfile
     environment:
@@ -18,9 +20,7 @@ services:
     networks:
       - zero
   static_b:
-    build: 
-      context: static-svc
-      dockerfile: Dockerfile
+    image: ealen/echo-server
     environment:
       - PORT=3000
     networks:
