@@ -5,8 +5,6 @@ services:
     build:
       context: haproxy
       dockerfile: Dockerfile
-    volumes:
-      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
     networks:
       - zero
     ports:
