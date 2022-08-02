@@ -4,3 +4,4 @@ RUN apk update && apk add curl net-tools bind-tools socat
 COPY --chown=haproxy hosts.map /hosts.map
 COPY --chown=haproxy haproxy.cfg /usr/local/etc/haproxy/haproxy.cfg
 USER root
+CMD ["haproxy", "-W","-f","/usr/local/etc/haproxy/haproxy.cfg","-p","/run/haproxy.pid"]
