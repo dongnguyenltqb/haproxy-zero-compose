@@ -42,3 +42,66 @@
      ```
 
    - check the test result
+
+5. **Very graceful deploy**
+
+   - Get back-end health status before up/down
+   - Make sure all request was processed before shutdown the server
+   - Sample code
+
+     ```bash
+     #!/bin/bash
+     function forwardTo(){
+        echo "set map /home/dong/code/learn-haproxy/hosts.map STATIC $1" | socat stdio tcp4-connect:127.0.0.1:9000
+     }
+
+     function readyToDown(){
+        serverName=$1
+        ok="false"
+        while [[ $ok == "false" ]];
+        do
+           sleep 1
+           count=$(echo "show servers conn $serverName $" | socat stdio tcp4-connect:127.0.0.1:9000 | sed -n 2p | cut -d " " -f 7)
+           echo "current connection on $serverName: ${count}"
+           if [[ $count == "0" ]]; then
+                 ok="true"
+           fi;
+        done
+
+     }
+
+     function waitItUp(){
+        serverName=$1
+        itUp="false"
+        while [[ $itUp == "false" ]];
+        do
+           echo "wait for $serverName up"
+           status=$(echo "show stat" | socat stdio tcp4-connect:127.0.0.1:9000 | cut -d "," -f 2,18 | column -s, -t | grep $serverName | awk "{print \$2}")
+           echo "$serverName status: $status"
+           if [[ $status != "UP" ]]; then
+                 sleep 1
+           else
+                 itUp="true"
+           fi
+        done
+     }
+
+     echo "deploying new version to green"
+     waitItUp green
+
+     echo "forward all traffic to green"
+     forwardTo green
+
+     echo "make sure all request was processed by s1 before deploying"
+     readyToDown blue
+
+     echo "ready to deploy blue (update new version)"
+     echo "deployed blue"
+     echo "wait for blue to up"
+     waitItUp blue
+     forwardTo blue
+
+     readyToDown green
+
+     echo "done"
+     ```
